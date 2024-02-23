@@ -2,6 +2,7 @@
 
 namespace Spatie\FlysystemDropbox;
 
+use DateTimeInterface;
 use Generator;
 use League\Flysystem\ChecksumProvider;
 use League\Flysystem\Config;
@@ -20,12 +21,13 @@ use League\Flysystem\UnableToReadFile;
 use League\Flysystem\UnableToRetrieveMetadata;
 use League\Flysystem\UnableToSetVisibility;
 use League\Flysystem\UnableToWriteFile;
+use League\Flysystem\UrlGeneration\TemporaryUrlGenerator;
 use League\MimeTypeDetection\FinfoMimeTypeDetector;
 use League\MimeTypeDetection\MimeTypeDetector;
 use Spatie\Dropbox\Client;
 use Spatie\Dropbox\Exceptions\BadRequest;
 
-class DropboxAdapter implements FilesystemAdapter, ChecksumProvider
+class DropboxAdapter implements FilesystemAdapter, ChecksumProvider, TemporaryUrlGenerator
 {
     protected Client $client;
 
@@ -376,5 +378,13 @@ class DropboxAdapter implements FilesystemAdapter, ChecksumProvider
     public function getUrl(string $path): string
     {
         return $this->client->getTemporaryLink($path);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function temporaryUrl(string $path, DateTimeInterface $expiresAt, Config $config): string
+    {
+        return $this->getUrl($path);
     }
 }
